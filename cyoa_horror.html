@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CYOA Horror Project</title>
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(circle, #1a1a1a, #000000);
+            color: white;
+            font-family: Georgia, serif;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #b30000;
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: gray;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        #game {
+            max-width: 750px;
+            margin: auto;
+            background-color: #0d0d0d;
+            padding: 35px;
+            border: 2px solid #5c0000;
+            border-radius: 15px;
+            box-shadow: 0 0 25px darkred;
+        }
+
+        #text {
+            font-size: 20px;
+            line-height: 1.7;
+            white-space: pre-line;
+            min-height: 220px;
+        }
+
+        button {
+            display: block;
+            margin: 15px auto;
+            padding: 14px;
+            width: 80%;
+            background-color: #650000;
+            color: white;
+            border: 1px solid #b30000;
+            border-radius: 8px;
+            font-size: 17px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #b30000;
+            transform: scale(1.03);
+        }
+
+        .ending {
+            color: #ff3333;
+            font-size: 26px;
+            font-weight: bold;
+            text-shadow: 0 0 10px red;
+        }
+
+        footer {
+            margin-top: 30px;
+            color: gray;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Trapped in the Dark</h1>
+<p class="subtitle">A Choose Your Own Adventure Horror Story inspired by Don't Breathe</p>
+
+<div id="game">
+    <p id="text"></p>
+    <div id="choices"></div>
+</div>
+
+<footer>
+    Created by Ibrahim Adams
+</footer>
+
+<script>
+const story = {
+    start: {
+        text: "You step inside the house, and the door clicks softly behind you.\n\nThe air is heavy and still. It smells like dust and something old.\n\nYou were supposed to be in and out quickly.\n\nBut now you feel it.\n\nYou are not alone.",
+        choices: [
+            {text: "Stay still and listen", next: "listen"},
+            {text: "Move further into the house", next: "move"}
+        ]
+    },
+
+    listen: {
+        text: "You hold your breath.\n\nThe silence stretches.\n\nThen you hear it.\n\nFootsteps.\n\nSlow. Uneven. Closer.",
+        choices: [
+            {text: "Hide behind the couch", next: "couch"},
+            {text: "Run for the front door", next: "captured"}
+        ]
+    },
+
+    move: {
+        text: "You take one careful step forward.\n\nThe floor creaks loudly beneath your foot.\n\nThe sound travels through the house.\n\nA voice cuts through the dark:\n\n'Who's there?'",
+        choices: [
+            {text: "Freeze and stay silent", next: "caught"},
+            {text: "Run upstairs", next: "upstairs"}
+        ]
+    },
+
+    couch: {
+        text: "You drop low and hide behind the couch.\n\nFootsteps enter the room.\n\nThey stop right in front of you.\n\nYou hear breathing.\n\nNot yours.",
+        choices: [
+            {text: "Stay completely still", next: "escape"},
+            {text: "Make a run for it", next: "captured"}
+        ]
+    },
+
+    upstairs: {
+        text: "You rush upstairs, each step louder than the last.\n\nAt the top, you see two doors.\n\nOne is cracked open.\n\nThe other is shut tight.",
+        choices: [
+            {text: "Enter the first room", next: "trapped"},
+            {text: "Enter the second room", next: "survival"}
+        ]
+    },
+
+    captured: {
+        text: "You run to the front door and twist the handle.\n\nLocked.\n\nBehind you, the footsteps get faster.\n\nA shadow moves toward you.\n\nENDING: CAPTURED",
+        ending: true,
+        choices: [
+            {text: "Play Again", next: "start"}
+        ]
+    },
+
+    caught: {
+        text: "You freeze in the darkness.\n\nFor one second, you think you are safe.\n\nThen a hand grabs your shoulder from behind.\n\nENDING: CAUGHT IN THE DARK",
+        ending: true,
+        choices: [
+            {text: "Play Again", next: "start"}
+        ]
+    },
+
+    escape: {
+        text: "You stay completely still.\n\nThe footsteps slowly move away.\n\nAfter waiting, you crawl toward the door.\n\nThis time, it opens.\n\nYou do not look back.\n\nENDING: ESCAPE",
+        ending: true,
+        choices: [
+            {text: "Play Again", next: "start"}
+        ]
+    },
+
+    trapped: {
+        text: "You enter the first room and lock the door.\n\nThere is a window, but it will not open.\n\nA loud bang shakes the door.\n\nThen another.\n\nThe wood begins to crack.\n\nENDING: TRAPPED",
+        ending: true,
+        choices: [
+            {text: "Play Again", next: "start"}
+        ]
+    },
+
+    survival: {
+        text: "You enter the second room and hide inside the closet.\n\nThe footsteps enter the room.\n\nThey pause.\n\nThen slowly leave.\n\nAfter several minutes, you sneak downstairs.\n\nThe front door opens.\n\nYou made it out alive.\n\nENDING: SURVIVAL",
+        ending: true,
+        choices: [
+            {text: "Play Again", next: "start"}
+        ]
+    }
+};
+
+let typingSpeed = 25;
+
+function typeText(text, element, callback) {
+    element.innerHTML = "";
+    let i = 0;
+
+    function type() {
+        if (i < text.length) {
+            element.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(type, typingSpeed);
+        } else {
+            callback();
+        }
+    }
+
+    type();
+}
+
+function showScene(scene) {
+    const current = story[scene];
+    const textElement = document.getElementById("text");
+    const choicesDiv = document.getElementById("choices");
+
+    choicesDiv.innerHTML = "";
+
+    if (current.ending) {
+        textElement.className = "ending";
+    } else {
+        textElement.className = "";
+    }
+
+    typeText(current.text, textElement, function() {
+        current.choices.forEach(choice => {
+            const button = document.createElement("button");
+            button.innerText = choice.text;
+            button.onclick = () => showScene(choice.next);
+            choicesDiv.appendChild(button);
+        });
+    });
+}
+
+showScene("start");
+</script>
+
+</body>
+</html>
